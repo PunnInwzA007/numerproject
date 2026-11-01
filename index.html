@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="th" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Numerical Method Calculator - Trapezoidal Rule (OOP)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-full flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
+
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+                    <i class="fa-solid fa-square-root-variable text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="brand-font text-lg font-bold bg-gradient-to-r from-white via-slate-200 to-indigo-300 bg-clip-text text-transparent">
+                        NumerProject
+                    </h1>
+                    <p class="text-xs text-slate-400">Numerical Methods Integration Calculator</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-grow grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <section class="lg:col-span-5 space-y-6">
+            <div class="glass-panel rounded-2xl p-6 shadow-2xl relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
+                
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-bold brand-font text-white flex items-center gap-2">
+                        <i class="fa-solid fa-calculator text-indigo-400"></i>
+                        Trapezoidal Rule Solver
+                    </h2>
+                    <button id="btnPreset" class="text-xs text-indigo-400 hover:text-indigo-300 bg-indigo-950/60 hover:bg-indigo-900/60 border border-indigo-800/50 px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> ตัวอย่างโจทย์
+                    </button>
+                </div>
+
+                <form id="calcForm" class="space-y-4">
+                    <div>
+                        <label for="functionInput" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                            ฟังก์ชัน $f(x)$
+                        </label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-500 code-font">f(x) =</span>
+                            <input type="text" id="functionInput" required placeholder="x^7 + 2*x^3 - 1" value="x^7 + 2*x^3 - 1"
+                                class="w-full pl-16 pr-4 py-2.5 bg-slate-900/90 border border-slate-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl text-slate-100 code-font text-sm outline-none transition">
+                        </div>
+                        <p class="text-[11px] text-slate-500 mt-1">รองรับเครื่องหมาย +, -, *, /, ^ และฟังก์ชัน e.g. sin(x), cos(x)</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="lowerBound" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                                ขอบเขตล่าง ($a$)
+                            </label>
+                            <input type="number" step="any" id="lowerBound" required placeholder="-1" value="-1"
+                                class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl text-slate-100 code-font text-sm outline-none transition">
+                        </div>
+                        <div>
+                            <label for="upperBound" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                                ขอบเขตบน ($b$)
+                            </label>
+                            <input type="number" step="any" id="upperBound" required placeholder="2" value="2"
+                                class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl text-slate-100 code-font text-sm outline-none transition">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="intervals" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                            จำนวนช่วงย่อย ($n$)
+                        </label>
+                        <input type="number" min="1" max="100" id="intervals" required placeholder="6" value="6"
+                            class="w-full px-3.5 py-2.5 bg-slate-900/90 border border-slate-700 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 rounded-xl text-slate-100 code-font text-sm outline-none transition">
+                    </div>
+
+                    <button type="submit" 
+                        class="w-full py-3 px-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold rounded-xl shadow-lg shadow-indigo-600/30 transition transform active:scale-[0.99] flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-bolt"></i>
+                        <span>เริ่มคำนวณ (Compute Solution)</span>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <section class="lg:col-span-7">
+            <div class="glass-panel rounded-2xl p-6 shadow-2xl min-h-[500px] flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-6">
+                        <div>
+                            <h2 class="text-lg font-bold brand-font text-white flex items-center gap-2">
+                                <i class="fa-solid fa-list-check text-purple-400"></i>
+                                ขั้นตอนการแสดงวิธีทำ (Step-by-Step Solution)
+                            </h2>
+                            <p class="text-xs text-slate-400">ผลลัพธ์การคำนวณและขั้นตอนประมวลผลด้วยสูตร Trapezoidal</p>
+                        </div>
+                        <span id="statusBadge" class="px-3 py-1 bg-slate-800 text-slate-400 border border-slate-700 text-xs font-semibold rounded-full flex items-center gap-1.5">
+                            <span class="w-2 h-2 rounded-full bg-slate-500"></span> พร้อมทำงาน
+                        </span>
+                    </div>
+
+                    <div id="outputContainer" class="space-y-6">
+                        <div class="text-center py-16 text-slate-500 space-y-3">
+                            <i class="fa-solid fa-square-root-variable text-5xl text-slate-700 animate-pulse"></i>
+                            <p class="text-sm">กรอกข้อมูลและกดปุ่ม "เริ่มคำนวณ" เพื่อแสดงขั้นตอนวิธีทำ</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="resultSummary" class="hidden mt-6 p-4 rounded-xl bg-gradient-to-r from-indigo-950/80 to-purple-950/80 border border-indigo-800/40">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <span class="text-xs text-indigo-300 font-semibold uppercase tracking-wider">ผลลัพธ์สุดท้าย (Final Answer)</span>
+                            <div id="finalValue" class="text-2xl font-bold text-white brand-font mt-0.5">I = 0.00</div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[11px] text-slate-400">Method</span>
+                            <div class="text-xs font-bold text-purple-300">Composite Trapezoidal</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-slate-900 bg-slate-950 py-4 text-center text-xs text-slate-500">
+        <p>Numerical Method Calculator</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
